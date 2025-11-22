@@ -5,7 +5,7 @@ import {
   PlayCircle, List, Trash2, Cpu, Download, CheckCircle, Box, 
   Zap, Thermometer, Move, Eye, Wifi, Speaker, Battery, GripHorizontal,
   AlertCircle, Settings, Save, X, RotateCw, MousePointerClick, Code,
-  ArrowRight, Plus, Footprints, Flag, MonitorPlay, Layers
+  ArrowRight, Plus, Footprints, Flag, MonitorPlay, Layers, Sun, MapPin, Monitor
 } from 'lucide-react';
 import { RobotCommand, RobotState } from '../types';
 import { translateCommands } from '../services/geminiService';
@@ -15,7 +15,7 @@ type Tab = 'designer' | 'editor' | 'simulator';
 
 interface ComponentItem {
   id: string;
-  type: 'cpu' | 'motor' | 'sensor-dist' | 'sensor-heat' | 'sensor-light' | 'camera' | 'gripper' | 'speaker' | 'wifi';
+  type: 'cpu' | 'motor' | 'sensor-dist' | 'sensor-heat' | 'sensor-light' | 'camera' | 'gripper' | 'speaker' | 'wifi' | 'battery' | 'gps' | 'display';
   name: string;
   icon: React.ReactNode;
   powerConsumption: number; // % per tick
@@ -66,6 +66,11 @@ const AVAILABLE_COMPONENTS: ComponentItem[] = [
   { id: 'cam-1', type: 'camera', name: 'كاميرا AI', icon: <Eye size={20} />, powerConsumption: 1.5, description: 'التعرف على البيئة' },
   { id: 'grip-1', type: 'gripper', name: 'ذراع قبض', icon: <GripHorizontal size={20} />, powerConsumption: 3.0, description: 'الإمساك بالأجسام' },
   { id: 'spk-1', type: 'speaker', name: 'مكبر صوت', icon: <Speaker size={20} />, powerConsumption: 0.8, description: 'إصدار تنبيهات صوتية' },
+  { id: 'wifi-1', type: 'wifi', name: 'وحدة اتصال WiFi', icon: <Wifi size={20} />, powerConsumption: 1.2, description: 'إرسال البيانات سحابياً' },
+  { id: 'light-1', type: 'sensor-light', name: 'حساس ضوء', icon: <Sun size={20} />, powerConsumption: 0.3, description: 'اكتشاف مصادر الضوء' },
+  { id: 'bat-1', type: 'battery', name: 'بطارية إضافية', icon: <Battery size={20} />, powerConsumption: 0, description: 'زيادة سعة الطاقة' },
+  { id: 'gps-1', type: 'gps', name: 'وحدة GPS', icon: <MapPin size={20} />, powerConsumption: 1.0, description: 'تحديد الموقع الجغرافي' },
+  { id: 'disp-1', type: 'display', name: 'شاشة OLED', icon: <Monitor size={20} />, powerConsumption: 0.5, description: 'عرض البيانات' },
 ];
 
 const Simulator: React.FC = () => {
@@ -75,10 +80,10 @@ const Simulator: React.FC = () => {
   // Robot Builder State
   const [chassis, setChassis] = useState<RobotSlot[]>([
     { id: 'center', label: 'المعالج (الوسط)', component: AVAILABLE_COMPONENTS[0], allowedTypes: ['cpu'] }, // Default CPU installed
-    { id: 'front', label: 'الجهة الأمامية', component: null, allowedTypes: ['sensor-dist', 'camera', 'gripper', 'sensor-light'] },
-    { id: 'left', label: 'الجانب الأيسر', component: null, allowedTypes: ['motor', 'sensor-heat', 'speaker'] },
-    { id: 'right', label: 'الجانب الأيمن', component: null, allowedTypes: ['motor', 'sensor-heat', 'speaker'] },
-    { id: 'back', label: 'الجهة الخلفية', component: null, allowedTypes: ['sensor-dist', 'wifi', 'battery'] },
+    { id: 'front', label: 'الجهة الأمامية', component: null, allowedTypes: ['sensor-dist', 'camera', 'gripper', 'sensor-light', 'display'] },
+    { id: 'left', label: 'الجانب الأيسر', component: null, allowedTypes: ['motor', 'sensor-heat', 'speaker', 'sensor-light', 'battery'] },
+    { id: 'right', label: 'الجانب الأيمن', component: null, allowedTypes: ['motor', 'sensor-heat', 'speaker', 'sensor-light', 'battery'] },
+    { id: 'back', label: 'الجهة الخلفية', component: null, allowedTypes: ['sensor-dist', 'wifi', 'battery', 'gps'] },
   ]);
   const [draggedComponent, setDraggedComponent] = useState<ComponentItem | null>(null);
   const [selectedSidebarComponent, setSelectedSidebarComponent] = useState<ComponentItem | null>(null);
