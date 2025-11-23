@@ -6,6 +6,25 @@ import { useCart } from '../context/CartContext';
 import { PRODUCTS } from '../data/products';
 import { Product } from '../types';
 
+// --- Reusable Tooltip Component ---
+interface TooltipProps {
+  text: string;
+  className?: string;
+  children: React.ReactNode;
+}
+
+const Tooltip: React.FC<TooltipProps> = ({ children, text, className = "" }) => (
+  <div className={`group/tooltip relative flex flex-col items-center justify-center ${className}`}>
+    {children}
+    <div className="pointer-events-none absolute bottom-full mb-2 w-max max-w-[150px] opacity-0 transition-opacity duration-300 group-hover/tooltip:opacity-100 z-50 text-center">
+      <div className="bg-slate-900/95 backdrop-blur text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-xl border border-white/10">
+        {text}
+      </div>
+      <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-slate-900/95 mx-auto"></div>
+    </div>
+  </div>
+);
+
 const Store: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<('kit' | 'sensor' | 'part')[]>([]);
@@ -60,15 +79,17 @@ const Store: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-secondary border border-white/10 text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-accent cursor-pointer appearance-none"
-                >
-                    <option value="relevance">ترتيب حسب: الأحدث</option>
-                    <option value="price_asc">السعر: من الأقل للأعلى</option>
-                    <option value="price_desc">السعر: من الأعلى للأقل</option>
-                </select>
+                <Tooltip text="ترتيب المنتجات حسب السعر أو الحداثة">
+                  <select 
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="bg-secondary border border-white/10 text-white text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-accent cursor-pointer appearance-none"
+                  >
+                      <option value="relevance">ترتيب حسب: الأحدث</option>
+                      <option value="price_asc">السعر: من الأقل للأعلى</option>
+                      <option value="price_desc">السعر: من الأعلى للأقل</option>
+                  </select>
+                </Tooltip>
              </div>
 
             <div className="relative w-full sm:w-72 group">
@@ -85,15 +106,19 @@ const Store: React.FC = () => {
                     onClick={() => setSearchTerm('')}
                     className="absolute left-3 top-3 text-gray-500 hover:text-white transition-colors"
                   >
-                    <X size={18} />
+                    <Tooltip text="مسح البحث">
+                       <X size={18} />
+                    </Tooltip>
                   </button>
                 )}
             </div>
 
-            <button className="w-full sm:w-auto bg-accent hover:bg-indigo-600 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-accent/10 hover:shadow-accent/30 hover:-translate-y-0.5 whitespace-nowrap font-bold">
-              <ShoppingCart size={20} />
-              <span>السلة ({cartCount})</span>
-            </button>
+            <Tooltip text="عرض سلة المشتريات">
+              <button className="w-full sm:w-auto bg-accent hover:bg-indigo-600 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-accent/10 hover:shadow-accent/30 hover:-translate-y-0.5 whitespace-nowrap font-bold">
+                <ShoppingCart size={20} />
+                <span>السلة ({cartCount})</span>
+              </button>
+            </Tooltip>
           </div>
         </div>
 
@@ -110,19 +135,20 @@ const Store: React.FC = () => {
                 </h3>
                 <div className="space-y-2">
                   {categories.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => toggleCategory(cat.id as any)}
-                      className={`w-full text-right px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-between group
-                        ${selectedCategories.includes(cat.id as any) 
-                          ? 'bg-highlight/10 text-highlight border border-highlight/20 shadow-lg shadow-highlight/5' 
-                          : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
-                        }
-                      `}
-                    >
-                      {cat.label}
-                      {selectedCategories.includes(cat.id as any) && <Check size={16} className="text-highlight" />}
-                    </button>
+                    <Tooltip key={cat.id} text={`تصفية حسب: ${cat.label}`} className="w-full">
+                      <button
+                        onClick={() => toggleCategory(cat.id as any)}
+                        className={`w-full text-right px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-between group
+                          ${selectedCategories.includes(cat.id as any) 
+                            ? 'bg-highlight/10 text-highlight border border-highlight/20 shadow-lg shadow-highlight/5' 
+                            : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
+                          }
+                        `}
+                      >
+                        {cat.label}
+                        {selectedCategories.includes(cat.id as any) && <Check size={16} className="text-highlight" />}
+                      </button>
+                    </Tooltip>
                   ))}
                 </div>
              </div>
@@ -135,19 +161,20 @@ const Store: React.FC = () => {
                 </h3>
                 <div className="space-y-2">
                   {priceRanges.map(range => (
-                    <button
-                      key={range.id}
-                      onClick={() => setSelectedPriceRange(range.id)}
-                      className={`w-full text-right px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-between group
-                        ${selectedPriceRange === range.id 
-                          ? 'bg-accent/10 text-accent border border-accent/20 shadow-lg shadow-accent/5' 
-                          : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
-                        }
-                      `}
-                    >
-                      {range.label}
-                      {selectedPriceRange === range.id && <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>}
-                    </button>
+                    <Tooltip key={range.id} text={`عرض المنتجات: ${range.label}`} className="w-full">
+                      <button
+                        onClick={() => setSelectedPriceRange(range.id)}
+                        className={`w-full text-right px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-between group
+                          ${selectedPriceRange === range.id 
+                            ? 'bg-accent/10 text-accent border border-accent/20 shadow-lg shadow-accent/5' 
+                            : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
+                          }
+                        `}
+                      >
+                        {range.label}
+                        {selectedPriceRange === range.id && <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>}
+                      </button>
+                    </Tooltip>
                   ))}
                 </div>
              </div>
@@ -162,7 +189,7 @@ const Store: React.FC = () => {
                   <Link to={`/store/product/${product.id}`} key={product.id} className="block group relative h-full">
                     
                     {/* Card Container with Enhanced Glassmorphism */}
-                    <div className="relative h-full flex flex-col bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/10 transition-all duration-500 hover:border-accent/50 hover:shadow-[0_10px_40px_-10px_rgba(99,102,241,0.25)] hover:-translate-y-2 overflow-hidden hover:scale-[1.02]">
+                    <div className="relative h-full flex flex-col bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-2xl border border-white/10 transition-all duration-500 hover:border-accent hover:shadow-[0_10px_40px_-10px_rgba(99,102,241,0.25)] hover:-translate-y-2 overflow-hidden hover:scale-[1.02]">
                       
                       {/* Image Area */}
                       <div className="relative h-64 overflow-hidden bg-secondary/50">
@@ -185,23 +212,27 @@ const Store: React.FC = () => {
                           </span>
                         </div>
 
-                        {/* Quick View Button - Enhanced Animation */}
-                        <button 
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setQuickViewProduct(product);
-                              }}
-                              className="absolute top-3 left-3 z-20 w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl flex items-center justify-center hover:bg-accent hover:border-accent transition-all duration-300 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0"
-                              title="نظرة سريعة"
-                           >
-                              <Eye size={18} />
-                        </button>
+                        {/* Quick View Button - Enhanced Animation + Tooltip */}
+                        <Tooltip 
+                          text="نظرة سريعة" 
+                          className="absolute top-3 left-3 z-20 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300"
+                        >
+                          <button 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setQuickViewProduct(product);
+                                }}
+                                className="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-xl flex items-center justify-center hover:bg-accent hover:border-accent transition-colors"
+                             >
+                                <Eye size={18} />
+                          </button>
+                        </Tooltip>
                       </div>
 
                       {/* Content Area */}
                       <div className="p-6 flex flex-col flex-1 relative z-10">
                         {/* Title */}
-                        <h3 className="text-xl font-extrabold text-white mb-2 group-hover:text-accent transition-colors line-clamp-1">
+                        <h3 className="text-2xl font-black text-white mb-2 group-hover:text-accent transition-colors line-clamp-1">
                           {product.name}
                         </h3>
                         
@@ -220,15 +251,17 @@ const Store: React.FC = () => {
                              </div>
                           </div>
                           
-                          <button 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              addToCart(product);
-                            }}
-                            className="w-12 h-12 rounded-xl bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/20 hover:bg-indigo-600 hover:scale-110 hover:rotate-3 transition-all duration-300"
-                          >
-                            <ShoppingCart size={20} />
-                          </button>
+                          <Tooltip text="أضف للسلة">
+                            <button 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                addToCart(product);
+                              }}
+                              className="w-12 h-12 rounded-xl bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/20 hover:bg-indigo-600 hover:scale-110 hover:rotate-3 transition-all duration-300"
+                            >
+                              <ShoppingCart size={20} />
+                            </button>
+                          </Tooltip>
                         </div>
                       </div>
                       
@@ -245,9 +278,11 @@ const Store: React.FC = () => {
                  <p className="text-slate-400 max-w-xs mx-auto mb-6 text-sm">
                    لم نعثر على منتجات تطابق بحثك. جرب تغيير كلمات البحث أو التصنيف.
                  </p>
-                 <button onClick={() => {setSearchTerm(''); setSelectedCategories([]); setSelectedPriceRange('all');}} className="text-accent hover:text-white font-bold text-sm border-b border-accent/50 pb-0.5 hover:border-white transition">
-                    إعادة ضبط الفلاتر
-                 </button>
+                 <Tooltip text="إلغاء جميع الفلاتر">
+                   <button onClick={() => {setSearchTerm(''); setSelectedCategories([]); setSelectedPriceRange('all');}} className="text-accent hover:text-white font-bold text-sm border-b border-accent/50 pb-0.5 hover:border-white transition">
+                      إعادة ضبط الفلاتر
+                   </button>
+                 </Tooltip>
               </div>
             )}
           </div>
@@ -262,12 +297,14 @@ const Store: React.FC = () => {
                   className="bg-secondary border border-white/10 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col md:flex-row animate-scale-up"
                   onClick={(e) => e.stopPropagation()}
               >
-                  <button 
-                      onClick={() => setQuickViewProduct(null)}
-                      className="absolute top-4 right-4 z-20 text-gray-400 hover:text-white bg-black/20 p-2 rounded-full hover:bg-black/40 transition"
-                  >
-                      <X size={20} />
-                  </button>
+                  <Tooltip text="إغلاق" className="absolute top-4 right-4 z-20">
+                      <button 
+                          onClick={() => setQuickViewProduct(null)}
+                          className="text-gray-400 hover:text-white bg-black/20 p-2 rounded-full hover:bg-black/40 transition"
+                      >
+                          <X size={20} />
+                      </button>
+                  </Tooltip>
 
                   <div className="w-full md:w-1/2 h-64 md:h-auto bg-primary/50 relative group overflow-hidden">
                        <img 
@@ -309,22 +346,26 @@ const Store: React.FC = () => {
                        </p>
 
                        <div className="flex gap-3 mt-auto">
-                          <button 
-                              onClick={() => {
-                                  addToCart(quickViewProduct);
-                                  setQuickViewProduct(null);
-                              }}
-                              className="flex-1 bg-accent hover:bg-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-accent/20 transition flex items-center justify-center gap-2"
-                          >
-                              <ShoppingCart size={20} />
-                              أضف للسلة
-                          </button>
-                          <Link 
-                              to={`/store/product/${quickViewProduct.id}`}
-                              className="px-5 rounded-xl border border-white/10 hover:bg-white/5 text-white transition flex items-center justify-center font-bold text-sm"
-                          >
-                              التفاصيل
-                          </Link>
+                          <Tooltip text="أضف للسلة" className="flex-1">
+                              <button 
+                                  onClick={() => {
+                                      addToCart(quickViewProduct);
+                                      setQuickViewProduct(null);
+                                  }}
+                                  className="w-full bg-accent hover:bg-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-accent/20 transition flex items-center justify-center gap-2"
+                              >
+                                  <ShoppingCart size={20} />
+                                  أضف للسلة
+                              </button>
+                          </Tooltip>
+                          <Tooltip text="التفاصيل الكاملة">
+                              <Link 
+                                  to={`/store/product/${quickViewProduct.id}`}
+                                  className="h-full px-5 py-3.5 rounded-xl border border-white/10 hover:bg-white/5 text-white transition flex items-center justify-center font-bold text-sm"
+                              >
+                                  التفاصيل
+                              </Link>
+                          </Tooltip>
                        </div>
                   </div>
               </div>

@@ -1,9 +1,40 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Bot, Mail, Lock, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Bot, Mail, ArrowRight, RefreshCw } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const { login, user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: '' });
+
+  // Redirect to profile automatically when user is authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/profile');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // محاكاة بسيطة وسريعة جداً
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // استخراج الاسم من البريد للدخول المباشر
+    const name = formData.email.split('@')[0];
+    
+    login(name, formData.email);
+    setLoading(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Elements */}
@@ -15,20 +46,17 @@ const Login: React.FC = () => {
           <Link to="/" className="inline-flex items-center justify-center text-accent mb-6">
              <Bot size={48} />
           </Link>
-          <h2 className="text-3xl font-bold text-white">مرحباً بعودتك</h2>
+          <h2 className="text-3xl font-bold text-white">تسجيل دخول مباشر</h2>
           <p className="mt-2 text-sm text-gray-400">
-            ليس لديك حساب؟{' '}
-            <Link to="/register" className="font-medium text-highlight hover:text-accent transition">
-              أنشئ حساباً جديداً
-            </Link>
+            الدخول متاح للجميع بدون كلمة مرور
           </p>
         </div>
 
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
-                البريد الإلكتروني
+                البريد الإلكتروني (لتعريف الحساب فقط)
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-500">
@@ -37,81 +65,41 @@ const Login: React.FC = () => {
                 <input
                   id="email"
                   name="email"
-                  type="email"
-                  autoComplete="email"
+                  type="text" 
                   required
+                  value={formData.email}
+                  onChange={handleChange}
                   className="block w-full pr-10 bg-primary border border-white/10 rounded-lg py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent sm:text-sm transition"
                   placeholder="name@example.com"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-1">
-                كلمة المرور
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-500">
-                  <Lock size={18} />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  className="block w-full pr-10 bg-primary border border-white/10 rounded-lg py-3 text-white placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent sm:text-sm transition"
-                  placeholder="••••••••"
                 />
               </div>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-accent focus:ring-accent border-gray-600 rounded bg-primary"
-              />
-              <label htmlFor="remember-me" className="mr-2 block text-sm text-gray-400">
-                تذكرني
-              </label>
+            <div className="text-sm text-gray-500">
+              * لا يلزم كلمة مرور
             </div>
-
             <div className="text-sm">
-              <a href="#" className="font-medium text-highlight hover:text-accent transition">
-                نسيت كلمة المرور؟
-              </a>
+              <Link to="/register" className="font-medium text-highlight hover:text-accent transition">
+                إنشاء حساب جديد
+              </Link>
             </div>
           </div>
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-accent hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent shadow-lg shadow-accent/20 transition"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-accent hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent shadow-lg shadow-accent/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              تسجيل الدخول
-              <ArrowRight className="absolute left-4 top-3.5" size={16} />
+              {loading ? <RefreshCw className="animate-spin" size={20} /> : (
+                <>
+                  الدخول الآن
+                  <ArrowRight className="absolute left-4 top-3.5" size={16} />
+                </>
+              )}
             </button>
-          </div>
-
-          <div className="relative">
-             <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10"></div>
-             </div>
-             <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-secondary text-gray-500">أو سجل الدخول باستخدام</span>
-             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-             <button type="button" className="flex justify-center items-center py-2.5 border border-white/10 rounded-lg hover:bg-white/5 transition">
-                <span className="text-white text-sm font-medium">Google</span>
-             </button>
-             <button type="button" className="flex justify-center items-center py-2.5 border border-white/10 rounded-lg hover:bg-white/5 transition">
-                <span className="text-white text-sm font-medium">GitHub</span>
-             </button>
           </div>
         </form>
       </div>

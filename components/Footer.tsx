@@ -26,9 +26,9 @@ const Footer: React.FC = () => {
             <h3 className="text-white text-lg font-bold mb-6 font-['Tajawal'] border-b border-accent/30 pb-2 w-fit">روابط سريعة</h3>
             <ul className="space-y-3 text-sm">
               <li><Link to="/about" className="hover:text-highlight transition duration-300 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>عن مُلَقّن</Link></li>
-              <li><Link to="/about" className="hover:text-highlight transition duration-300 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>المدربون</Link></li>
-              <li><Link to="/about" className="hover:text-highlight transition duration-300 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>الشهادات</Link></li>
+              <li><Link to="/courses" className="hover:text-highlight transition duration-300 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>الدورات التدريبية</Link></li>
               <li><Link to="/store" className="hover:text-highlight transition duration-300 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>المتجر</Link></li>
+              <li><Link to="/simulator" className="hover:text-highlight transition duration-300 flex items-center gap-2"><span className="w-1.5 h-1.5 bg-accent rounded-full"></span>المحاكي</Link></li>
             </ul>
           </div>
 

@@ -11,6 +11,7 @@ import Docs from './pages/Docs';
 import Courses from './pages/Courses';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import ProductDetails from './pages/ProductDetails';
 import CourseDetails from './pages/CourseDetails';
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
           <Route path="docs" element={<Docs />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
     </Router>

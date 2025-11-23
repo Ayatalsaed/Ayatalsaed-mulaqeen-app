@@ -47,3 +47,48 @@ export interface Course {
   image: string;
   price: number | 'free';
 }
+
+// --- SIMULATION ENGINE TYPES ---
+
+export interface ComponentSchema {
+  id: string;
+  type: string;
+  name: string;
+  powerConsumption: number;
+}
+
+export interface RobotSchema {
+  processor: {
+    type: string;
+    position: string;
+  } | null;
+  slots: {
+    front: ComponentSchema | null;
+    back: ComponentSchema | null;
+    left: ComponentSchema | null;
+    right: ComponentSchema | null;
+  };
+  power: {
+    totalCapacity: number;
+    current: number;
+    consumptionPerTick: number;
+  };
+}
+
+export interface SensorReadings {
+  distance: number; // cm
+  temperature: number; // Celsius
+  light: number; // Lux/Percentage
+  collision: boolean;
+}
+
+export interface SimulationStepResult {
+  x: number;
+  y: number;
+  direction: 0 | 90 | 180 | 270;
+  battery: number;
+  temperature: number;
+  sensors: SensorReadings;
+  logs: string[];
+  moved: boolean;
+}

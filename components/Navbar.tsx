@@ -1,14 +1,16 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, Code, BookOpen, Info, HelpCircle, GraduationCap } from 'lucide-react';
+import { Menu, X, ShoppingBag, Code, BookOpen, Info, HelpCircle, GraduationCap, User, LogOut } from 'lucide-react';
 import Logo from './Logo';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { cartCount } = useCart();
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: 'الرئيسية', path: '/', icon: null },
@@ -62,12 +64,28 @@ const Navbar: React.FC = () => {
                )}
             </Link>
 
-            <Link to="/login" className="text-gray-300 hover:text-highlight text-sm font-bold transition font-latin">
-              Login
-            </Link>
-            <Link to="/register" className="bg-accent hover:bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-accent/20">
-              ابدا الآن
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <Link to="/profile" className="flex items-center gap-2 text-gray-300 hover:text-white transition">
+                  <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-bold border border-white/10">
+                    {user.name[0]}
+                  </div>
+                  <span className="text-sm font-bold max-w-[100px] truncate">{user.name}</span>
+                </Link>
+                <button onClick={logout} className="text-gray-500 hover:text-red-400 transition p-1" title="تسجيل الخروج">
+                   <LogOut size={20} />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link to="/login" className="text-gray-300 hover:text-highlight text-sm font-bold transition font-latin">
+                  Login
+                </Link>
+                <Link to="/register" className="bg-accent hover:bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition shadow-lg shadow-accent/20">
+                  ابدا الآن
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="-mr-2 flex lg:hidden">
@@ -108,12 +126,27 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-white/10 mt-2 flex flex-col gap-3 p-2">
-              <Link to="/login" onClick={() => setIsOpen(false)} className="block text-center w-full px-3 py-3 rounded-md text-base font-bold text-gray-300 hover:bg-white/5">
-                تسجيل الدخول
-              </Link>
-              <Link to="/register" onClick={() => setIsOpen(false)} className="block text-center w-full px-3 py-3 rounded-md text-base font-bold bg-accent text-white hover:opacity-90">
-                حساب جديد
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-bold text-white bg-white/5">
+                     <User size={20} />
+                     <span>{user.name}</span>
+                  </Link>
+                  <button onClick={() => {logout(); setIsOpen(false);}} className="flex items-center gap-3 px-3 py-3 rounded-md text-base font-bold text-red-400 hover:bg-red-500/10">
+                     <LogOut size={20} />
+                     <span>تسجيل الخروج</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsOpen(false)} className="block text-center w-full px-3 py-3 rounded-md text-base font-bold text-gray-300 hover:bg-white/5">
+                    تسجيل الدخول
+                  </Link>
+                  <Link to="/register" onClick={() => setIsOpen(false)} className="block text-center w-full px-3 py-3 rounded-md text-base font-bold bg-accent text-white hover:opacity-90">
+                    حساب جديد
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
